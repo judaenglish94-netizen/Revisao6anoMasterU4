@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Present Space Academy: English Master Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #090d16 0%, #0f172a 40%, #1e1b4b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .font-game {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(16px);
+            border: 2px solid rgba(99, 102, 241, 0.35);
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 25px rgba(99, 102, 241, 0.2);
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4f46e5;
+            border-radius: 8px;
+            border: 2px solid rgba(15, 23, 42, 0.8);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6366f1;
+        }
+
+        @keyframes pulse-btn {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        .animate-pulse-btn {
+            animation: pulse-btn 2.2s infinite ease-in-out;
+        }
+
+        .option-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            border-color: #818cf8;
+            background: rgba(129, 140, 248, 0.15);
+        }
+        .option-btn.selected {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.25);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+        .option-btn.correct {
+            border-color: #22c55e !important;
+            background: rgba(34, 197, 94, 0.25) !important;
+            color: #4ade80 !important;
+        }
+        .option-btn.incorrect {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.25) !important;
+            color: #f87171 !important;
+        }
+
+        .word-tile {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+        .word-tile:hover {
+            transform: scale(1.05);
+            background-color: #4f46e5;
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-4 md:p-6 min-h-screen flex flex-col justify-between">
+
+    <!-- CABEÇALHO DA APLICAÇÃO -->
+    <header class="max-w-5xl mx-auto w-full mb-4 flex justify-between items-center bg-slate-900/90 p-3 sm:p-4 rounded-2xl border border-indigo-500/40 backdrop-blur-md">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-amber-400 flex items-center justify-center text-2xl shadow-lg shadow-indigo-500/30 animate-bounce">
+                🚀
+            </div>
+            <div>
+                <h1 class="font-game text-xl sm:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-indigo-300 to-cyan-400">
+                    ENGLISH SPACE ACADEMY
+                </h1>
+                <p class="text-xs text-indigo-200 font-bold hidden sm:block">Desafio do Simple Present!</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-4">
+            <button id="open-menu-btn" onclick="toggleQuestionMenu()" class="hidden bg-slate-800 hover:bg-slate-700 text-indigo-300 px-3 py-2 rounded-xl font-bold text-xs sm:text-sm border border-indigo-500/40 transition flex items-center gap-2">
+                <i class="fa-solid fa-list-check text-amber-400"></i>
+                <span class="hidden sm:inline">Navegador</span> (60)
+            </button>
+            <div id="score-pill" class="hidden bg-indigo-950/90 border border-indigo-400/50 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
+                <i class="fa-solid fa-star text-amber-400 text-lg"></i>
+                <span id="score-text" class="font-game text-amber-300 text-sm sm:text-base">0 / 60</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-5xl mx-auto w-full flex-1 flex flex-col justify-center my-auto">
+
+        <!-- TELA 1: INTRODUÇÃO E RESUMO TEÓRICO DO SIMPLE PRESENT -->
+        <section id="screen-welcome" class="glass-card p-4 sm:p-8 rounded-3xl relative overflow-hidden">
+            <div class="text-center mb-5">
+                <span class="inline-block bg-indigo-500/20 text-indigo-300 text-xs sm:text-sm px-4 py-1.5 rounded-full border border-indigo-500/40 font-bold mb-2">
+                    🛸 Manual da Nave do Conhecimento
+                </span>
+                <h2 class="font-game text-2xl sm:text-4xl text-amber-300 mb-2">
+                    Resumo Completo do Simple Present
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-300 max-w-2xl mx-auto">
+                    Leia todas as regras abaixo com atenção antes de embarcar no desafio espacial de 60 questões!
+                </p>
+            </div>
+
+            <!-- CAIXA DE ROLAGEM COM O RESUMO TEÓRICO -->
+            <div class="bg-slate-950/80 border border-slate-700/80 rounded-2xl p-4 sm:p-6 max-h-[420px] overflow-y-auto space-y-6 text-slate-200 text-sm sm:text-base leading-relaxed">
+                
+                <!-- SEÇÃO 1: O QUE É E PARA QUE SERVE -->
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 text-amber-400 font-game text-lg sm:text-xl border-b border-amber-500/30 pb-1">
+                        🌟 1. O que é o Simple Present?
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300">
+                        O <strong>Simple Present</strong> (Presente Simples) é usado para falar sobre <strong>hábitos</strong>, <strong>rotinas diárias</strong>, <strong>fatos gerais</strong> e <strong>verdades universais</strong>.
+                    </p>
+                    <div class="bg-slate-900/90 p-3.5 rounded-xl border border-amber-500/40 text-xs sm:text-sm">
+                        <p class="font-bold text-amber-300 mb-1">Exemplo:</p>
+                        <p>I play video games every day. (<em>Eu jogo video games todos os dias.</em>)</p>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO 2: FORMA AFIRMATIVA E A REGRA DO HE / SHE / IT -->
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 text-cyan-400 font-game text-lg sm:text-xl border-b border-cyan-500/30 pb-1">
+                        ✨ 2. Frases Afirmativas e a Regra Especial de He / She / It
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300">
+                        Para as pessoas <strong>I</strong> (eu), <strong>You</strong> (você/vocês), <strong>We</strong> (nós) e <strong>They</strong> (eles/elas), o verbo <strong>não muda nada</strong>!
+                    </p>
+                    <div class="bg-slate-900/90 p-3.5 rounded-xl border border-cyan-500/40 text-xs sm:text-sm space-y-2">
+                        <p>I eat apples. (<em>Eu como maçãs.</em>)</p>
+                        <p>They live in London. (<em>Eles moram em Londres.</em>)</p>
+                    </div>
+
+                    <p class="text-xs sm:text-sm text-slate-300 font-bold text-amber-300">
+                        ⚠️ ATENÇÃO MÁXIMA NA 3ª PESSOA DO SINGULAR (He, She, It):
+                    </p>
+                    <p class="text-xs sm:text-sm text-slate-300">
+                        Quando o sujeito for <strong>He</strong> (ele), <strong>She</strong> (ela) ou <strong>It</strong> (coisa/animal), nós devemos **adicionar "-s", "-es" ou "-ies"** ao verbo principal:
+                    </p>
+                    <ul class="list-disc list-inside text-xs sm:text-sm space-y-2 bg-slate-900/90 p-3.5 rounded-xl border border-indigo-500/40">
+                        <li><strong>Regra geral:</strong> adicionamos <strong>-s</strong> ao verbo. <br>&nbsp;&nbsp;Exemplo: She <span class="text-amber-300 font-bold">likes</span> ice cream. (<em>Ela gosta de sorvete.</em>)</li>
+                        <li><strong>Verbos terminados em -o, -ch, -sh, -ss, -x, -z:</strong> adicionamos <strong>-es</strong>. <br>&nbsp;&nbsp;Exemplo: He <span class="text-amber-300 font-bold">goes</span> to school. (<em>Ele vai para a escola.</em>) | He <span class="text-amber-300 font-bold">watches</span> TV. (<em>Ele assiste TV.</em>)</li>
+                        <li><strong>Verbos terminados em consoante + y:</strong> tiramos o <strong>y</strong> e colocamos <strong>-ies</strong>. <br>&nbsp;&nbsp;Exemplo: She <span class="text-amber-300 font-bold">studies</span> English. (<em>Ela estuda inglês.</em>) [study $\rightarrow$ studies]</li>
+                        <li><strong>Verbos terminados em vogal + y:</strong> apenas adicionamos <strong>-s</strong>. <br>&nbsp;&nbsp;Exemplo: He <span class="text-amber-300 font-bold">plays</span> soccer. (<em>Ele joga futebol.</em>)</li>
+                    </ul>
+
+                    <!-- EXCEÇÃO DO HAS -->
+                    <div class="bg-rose-950/80 p-4 rounded-xl border border-rose-500/60 text-xs sm:text-sm space-y-1">
+                        <p class="font-bold text-rose-300 text-sm flex items-center gap-2">
+                            🔥 EXCEÇÃO SUPER IMPORTANTE: O Verbo HAVE
+                        </p>
+                        <p class="text-slate-200">
+                            O verbo <strong>have</strong> (ter) <strong>NÃO</strong> vira "haves". Ele é irregular e vira <strong class="text-amber-300 underline text-base">HAS</strong> quando o sujeito for <strong>He</strong>, <strong>She</strong> ou <strong>It</strong>!
+                        </p>
+                        <p class="text-slate-300 italic pt-1">
+                            • I <strong>have</strong> a dog. (<em>Eu tenho um cachorro.</em>)<br>
+                            • She <strong class="text-amber-300">has</strong> a cat. (<em>Ela tem um gato.</em>)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO 3: FORMA NEGATIVA (DON'T / DOESN'T) -->
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 text-rose-400 font-game text-lg sm:text-xl border-b border-rose-500/30 pb-1">
+                        🚫 3. Frases Negativas (Don't / Doesn't)
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300">
+                        Para fazer uma negação no Simple Present, usamos os verbos auxiliares de negação <strong>don't</strong> ou <strong>doesn't</strong> antes do verbo principal:
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm">
+                        <div class="bg-slate-900/90 p-3.5 rounded-xl border border-indigo-500/40">
+                            <p class="font-bold text-indigo-300 mb-1">Usamos DON'T (do not):</p>
+                            <p>Com <strong>I, You, We, They</strong>.</p>
+                            <p class="text-amber-300 font-bold mt-1">Exemplo: They don't like milk. (<em>Eles não gostam de leite.</em>)</p>
+                        </div>
+                        <div class="bg-slate-900/90 p-3.5 rounded-xl border border-rose-500/40">
+                            <p class="font-bold text-rose-300 mb-1">Usamos DOESN'T (does not):</p>
+                            <p>Com <strong>He, She, It</strong>.</p>
+                            <p class="text-amber-300 font-bold mt-1">Exemplo: She doesn't like milk. (<em>Ela não gosta de leite.</em>)</p>
+                        </div>
+                    </div>
+                    <div class="bg-amber-950/80 p-3.5 rounded-xl border border-amber-500/50 text-xs sm:text-sm text-slate-200">
+                        <p class="font-bold text-amber-300">⚡ SEGREDO DO SUPER-HERÓI:</p>
+                        <p>Quando usarmos <strong>doesn't</strong>, o verbo principal <strong>VOLTA PARA A FORMA NORMAL</strong> (perde o "-s", "-es", "-ies" e o "has" volta a ser "have")!</p>
+                        <p class="italic text-slate-300 mt-1">Correto: She doesn't <strong>like</strong> pizza. (E NÃO: She doesn't likes...)</p>
+                        <p class="italic text-slate-300">Correto: He doesn't <strong>have</strong> a car. (E NÃO: He doesn't has...)</p>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO 4: FORMA INTERROGATIVA (DO / DOES) -->
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 text-emerald-400 font-game text-lg sm:text-xl border-b border-emerald-500/30 pb-1">
+                        ❓ 4. Frases Interrogativas (Perguntas com Do / Does)
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300">
+                        Para fazer perguntas, colocamos o auxiliar <strong>DO</strong> ou <strong>DOES</strong> lá no <strong>início da frase</strong>, antes do sujeito!
+                    </p>
+                    <div class="bg-slate-900/90 p-3.5 rounded-xl border border-emerald-500/40 text-xs sm:text-sm space-y-2">
+                        <p>• <strong>DO</strong> you speak English? (<em>Você fala inglês?</em>)</p>
+                        <p>• <strong>DOES</strong> he work here? (<em>Ele trabalha aqui?</em>)</p>
+                        <p class="text-amber-300 font-bold mt-1">
+                            Lembre-se: Com <strong>Does</strong>, o verbo principal também volta para a forma normal sem "-s"!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO 5: ADVÉRBIOS DE FREQUÊNCIA -->
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 text-purple-400 font-game text-lg sm:text-xl border-b border-purple-500/30 pb-1">
+                        ⏰ 5. Advérbios de Frequência (Frequency Adverbs)
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300">
+                        São palavras que mostram com que frequência fazemos algo: <strong>always</strong> (sempre), <strong>usually</strong> (normalmente), <strong>often</strong> (frequentemente), <strong>sometimes</strong> (às vezes), <strong>never</strong> (nunca).
+                    </p>
+                    <div class="bg-slate-900/90 p-3.5 rounded-xl border border-purple-500/40 text-xs sm:text-sm space-y-2">
+                        <p class="font-bold text-purple-300">📍 Onde colocar o advérbio na frase?</p>
+                        <p>1. <strong>Regra Geral:</strong> Fica <strong>DEPOIS da pessoa (sujeito)</strong> e <strong>ANTES do verbo principal</strong>.</p>
+                        <p class="text-slate-300 italic pl-3">• I <strong>always eat</strong> breakfast. (<em>Eu sempre tomo café da manhã.</em>)</p>
+                        <p class="text-slate-300 italic pl-3">• She <strong>never plays</strong> tennis. (<em>Ela nunca joga tênis.</em>)</p>
+
+                        <p class="font-bold text-amber-300 mt-2">2. EXCEÇÃO DO VERBO TO BE (am / is / are):</p>
+                        <p>Quando a frase usar o verbo <strong>TO BE</strong>, o advérbio fica <strong>DEPOIS do verbo to be</strong>!</p>
+                        <p class="text-slate-300 italic pl-3">• He is <strong>always</strong> happy. (<em>Ele está sempre feliz.</em>)</p>
+                        <p class="text-slate-300 italic pl-3">• They are <strong>never</strong> late. (<em>Eles nunca estão atrasados.</em>)</p>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO 6: WH-QUESTIONS -->
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 text-indigo-300 font-game text-lg sm:text-xl border-b border-indigo-500/30 pb-1">
+                        🎯 6. Wh- Questions (Perguntas Especiais)
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300">
+                        Quando queremos respostas completas, usamos as palavras interrogativas no início da pergunta antes do <em>Do/Does</em>:
+                    </p>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs sm:text-sm bg-slate-900/90 p-3 rounded-xl border border-indigo-500/40">
+                        <div><strong>What</strong> (O que / Qual)</div>
+                        <div><strong>Where</strong> (Onde)</div>
+                        <div><strong>When</strong> (Quando)</div>
+                        <div><strong>Who</strong> (Quem)</div>
+                        <div><strong>Why</strong> (Por que)</div>
+                        <div><strong>How</strong> (Como)</div>
+                    </div>
+                    <p class="text-xs text-slate-300 italic">
+                        Exemplo: <strong>Where do</strong> you live? (<em>Onde você mora?</em>) $\rightarrow$ I live in Brazil.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- BOTÃO INICIAR -->
+            <div class="mt-6 text-center">
+                <button onclick="startQuiz()" class="animate-pulse-btn w-full sm:w-auto bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-game text-xl px-10 py-4 rounded-2xl shadow-xl shadow-amber-500/30 transform transition active:scale-95 flex items-center justify-center gap-3 mx-auto border-2 border-amber-200">
+                    <i class="fa-solid fa-rocket"></i> START QUIZ (INICIAR QUIZ)
+                </button>
+            </div>
+        </section>
+
+        <!-- TELA 2: ÁREA DAS QUESTÕES DO QUIZ -->
+        <section id="screen-quiz" class="hidden glass-card p-4 sm:p-8 rounded-3xl relative">
+            
+            <!-- Barra de Progresso Superior -->
+            <div class="mb-4">
+                <div class="flex justify-between items-center text-xs sm:text-sm font-bold text-indigo-300 mb-1.5">
+                    <span id="question-category-tag" class="bg-indigo-900/80 px-3 py-1 rounded-full border border-indigo-400/40 text-indigo-200">
+                        Part 1: Affirmative Sentences
+                    </span>
+                    <span id="question-number-tag" class="text-amber-400 font-game">
+                        Question 1 of 60
+                    </span>
+                </div>
+                <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden p-0.5 border border-slate-800">
+                    <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 via-cyan-400 to-amber-400 h-full rounded-full transition-all duration-300" style="width: 1.66%"></div>
+                </div>
+            </div>
+
+            <!-- Enunciado da Pergunta -->
+            <div class="mb-5 bg-slate-950/70 p-4 sm:p-5 rounded-2xl border border-indigo-500/30">
+                <h3 id="question-statement" class="text-base sm:text-xl font-bold text-slate-100 leading-snug">
+                    Carregando pergunta...
+                </h3>
+            </div>
+
+            <!-- ÁREA DINÂMICA: OPÇÕES MÚLTIPLA ESCOLHA OU UN SCRAMBLE -->
+            <div id="interactive-area" class="mb-6">
+                <!-- Alternativas injetadas via JS -->
+            </div>
+
+            <!-- Caixa de Feedback / Justificativa Pedagógica -->
+            <div id="feedback-box" class="hidden mb-6 p-4 rounded-2xl border transition-all">
+                <div class="flex items-start gap-3">
+                    <div id="feedback-icon" class="text-2xl mt-0.5 shrink-0"></div>
+                    <div>
+                        <h4 id="feedback-title" class="font-game text-base sm:text-lg mb-1"></h4>
+                        <p id="feedback-text" class="text-xs sm:text-sm leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões de Controle de Navegação -->
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-slate-800">
+                <button id="btn-prev" onclick="prevQuestion()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Previous (Anterior)
+                </button>
+
+                <button id="btn-confirm" onclick="confirmAnswer()" class="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-game text-base shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check-circle text-emerald-400"></i> Confirmar Resposta
+                </button>
+
+                <button id="btn-next" onclick="nextQuestion()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition flex items-center justify-center gap-2">
+                    Next (Próxima) <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- TELA 3: RELATÓRIO FINAL DE DESEMPENHO -->
+        <section id="screen-report" class="hidden glass-card p-6 sm:p-10 rounded-3xl text-center">
+            <div class="inline-block p-4 bg-indigo-500/20 rounded-full border border-indigo-500/40 mb-3 animate-bounce">
+                <span id="report-emoji" class="text-4xl sm:text-5xl">🏆</span>
+            </div>
+            
+            <h2 id="report-title" class="font-game text-2xl sm:text-4xl text-amber-300 mb-1">
+                Mission Accomplished!
+            </h2>
+            <p id="report-subtitle" class="text-xs sm:text-base text-slate-300 mb-6">
+                Confira o seu relatório completo da Academia de Inglês:
+            </p>
+
+            <!-- Grid de Estatísticas -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                <div class="bg-emerald-950/70 border border-emerald-500/40 p-3.5 rounded-2xl">
+                    <span class="text-xs font-bold text-emerald-400 block mb-1">CORRECT (ACERTOS)</span>
+                    <span id="stat-correct-count" class="font-game text-2xl sm:text-3xl text-emerald-300">0</span>
+                    <span id="stat-correct-pct" class="text-xs text-emerald-400/80 block mt-1">(0%)</span>
+                </div>
+                <div class="bg-rose-950/70 border border-rose-500/40 p-3.5 rounded-2xl">
+                    <span class="text-xs font-bold text-rose-400 block mb-1">ERRORS (ERROS)</span>
+                    <span id="stat-error-count" class="font-game text-2xl sm:text-3xl text-rose-300">0</span>
+                    <span id="stat-error-pct" class="text-xs text-rose-400/80 block mt-1">(0%)</span>
+                </div>
+                <div class="bg-amber-950/70 border border-amber-500/40 p-3.5 rounded-2xl">
+                    <span class="text-xs font-bold text-amber-300 block mb-1">AFFIRMATIVE</span>
+                    <span id="stat-aff-pct" class="font-game text-xl sm:text-2xl text-amber-200">0%</span>
+                    <span class="text-xs text-amber-300/70 block mt-1">Aproveitamento</span>
+                </div>
+                <div class="bg-indigo-950/70 border border-indigo-500/40 p-3.5 rounded-2xl">
+                    <span class="text-xs font-bold text-indigo-300 block mb-1">NEGATIVE / INTERROG.</span>
+                    <span id="stat-neg-pct" class="font-game text-xl sm:text-2xl text-indigo-200">0%</span>
+                    <span class="text-xs text-indigo-300/70 block mt-1">Aproveitamento</span>
+                </div>
+            </div>
+
+            <!-- Caixa de Recomendações de Estudo -->
+            <div id="review-recommendations" class="text-left bg-slate-950/90 border border-slate-700 p-5 rounded-2xl mb-8 space-y-3">
+                <!-- Conteúdo gerado via JS -->
+            </div>
+
+            <!-- Botão Tentar Novamente -->
+            <button onclick="restartQuiz()" class="bg-gradient-to-r from-indigo-600 via-purple-600 to-amber-500 hover:from-indigo-500 hover:to-amber-400 text-white font-game text-lg px-8 py-3.5 rounded-2xl shadow-xl shadow-indigo-600/30 transition transform active:scale-95 inline-flex items-center gap-2">
+                <i class="fa-solid fa-rotate-right"></i> RESTART QUIZ (REINICIAR)
+            </button>
+        </section>
+
+    </main>
+
+    <!-- MODAL NAVEGADOR DE QUESTÕES (GRID 1 a 60) -->
+    <div id="question-menu-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-3xl w-full p-5 sm:p-6 rounded-3xl border border-indigo-500/40 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+                <h3 class="font-game text-lg sm:text-xl text-amber-300 flex items-center gap-2">
+                    <i class="fa-solid fa-compass text-cyan-400"></i> Question Navigator (60 Questions)
+                </h3>
+                <button onclick="toggleQuestionMenu()" class="text-slate-400 hover:text-white text-xl p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="flex flex-wrap gap-3 text-xs mb-4 justify-center">
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-slate-700"></span> Pending</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-600"></span> Correct</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-600"></span> Incorrect</span>
+            </div>
+
+            <div id="questions-grid" class="grid grid-cols-6 sm:grid-cols-10 gap-2 overflow-y-auto p-1 flex-1">
+                <!-- Botões de 1 a 60 gerados via JS -->
+            </div>
+
+            <button onclick="toggleQuestionMenu()" class="mt-4 w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-bold text-sm">
+                Close Navigator (Fechar)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        /* BANCO COMPLETO DE 60 QUESTÕES CUIDADOSAMENTE ELABORADAS */
+        const rawQuestions = [
+            // ==========================================
+            // BLOCO 1: AFIRMATIVAS E CONJUGAÇÕES (Q1 - Q15)
+            // ==========================================
+            {
+                id: 1,
+                part: 1,
+                type: "mc",
+                category: "Part 1: Affirmative Sentences",
+                statement: "Complete the sentence correctly: 'She _____ to school by bus every morning.'",
+                options: ["go", "goes", "goings", "gos", "is go"],
+                correctIndex: 1,
+                explanation: "Para o sujeito 'She', adicionamos '-es' aos verbos que terminam com a letra 'o' (go -> goes)."
+            },
+            {
+                id: 2,
+                part: 1,
+                type: "mc",
+                category: "Part 1: Affirmative Sentences",
+                statement: "Complete with the correct form of the verb 'have': 'My brother _____ two dogs and a cat.'",
+                options: ["have", "haves", "has", "having", "is have"],
+                correctIndex: 2,
+                explanation: "LEMBRE-SE DA EXCEÇÃO! O verbo 'have' é irregular: para 'He/She/It', ele vira 'HAS'."
+            },
+            {
+                id: 3,
+                part: 1,
+                type: "mc",
+                category: "Part 1: Affirmative Sentences",
+                statement: "Which sentence has the correct adverb of frequency position?",
+                options: ["I play always soccer on Saturdays.", "I always play soccer on Saturdays.", "Always I play soccer on Saturdays.", "I play soccer always on Saturdays.", "Soccer I play always on Saturdays."],
+                correctIndex: 1,
+                explanation: "Advérbios de frequência (always, usually) ficam DEPOIS do sujeito (I) e ANTES do verbo principal (play)."
+            },
+            {
+                id: 4,
+                part: 1,
+                type: "mc",
+                category: "Part 1: Affirmative Sentences",
+                statement: "Choose the correct sentence with the verb TO BE and a frequency adverb:",
+                options: ["He always is happy.", "He is happy always.", "He is always happy.", "Always he is happy.", "He happy is always."],
+                correctIndex: 2,
+                explanation: "EXCEÇÃO DO VERBO TO BE: O advérbio de frequência fica DEPOIS do verbo 'is' (He is always happy)."
+            },
+            {
+                id: 5,
+                part: 1,
+                type: "mc",
+                category: "Part 1: Affirmative Sentences",
+                statement: "Complete: 'The baby _____ every night.' (Verb: cry)",
+                options: ["crys", "cry", "cries", "crying", "is cry"],
+                correctIndex: 2,
+                explanation: "Para verbos terminados em CONSOANTE + Y (cry), trocamos o 'y' por '-ies' quando o sujeito é He/She/It (The baby = it)."
+            },
+            {
+                id: 6,
+                part: 1,
+                type: "mc",
+                category: "Part 1: Affirmative Sentences",
+                statement: "Complete: 'My friends _____ basketball after school.'",
+                options: ["plays", "play", "playes", "playing", "is play"],
+                correctIndex: 1,
+                explanation: "'My friends' equivale ao pronome 'They' (eles). Com They, o verbo NÃO ganha 's' (They play)."
+            },
+            {
+                id: 7,
+                part: 1,
+                type: "mc",
+                category: "Part 1: Affirmative Sentences",
+                statement: "Complete: 'He _____ television in the evening.' (Verb: watch)",
+                options: ["watch", "watchs", "watches", "watching", "is watch"],
+                correctIndex: 2,
+                explanation: "Verbos terminados em '-ch' ganham '-es' na 3ª pessoa do singular (He watches)."
+            },
+            {
+                id: 8,
+                part: 1,
+                type: "mc",
+                category: "Part 1: Affirmative Sentences",
+                statement: "Complete: 'We _____ breakfast at 7:00 AM every day.'",
+                options: ["has", "have", "haves", "having", "eats"],
+                correctIndex: 1,
+                explanation: "Para o sujeito 'We' (nós), usamos a forma normal 'have'."
+            },
+            {
+                id: 9,
+                part: 1,
+                type: "mc",
+                category: "Part 1: Affirmative Sentences",
+                statement: "Complete: 'Leo _____ video games on weekends.' (Verb: play)",
+                options: ["plaies", "plays", "playes", "play", "is play"],
+                correctIndex: 1,
+                explanation: "Verbos terminados em VOGAL + Y (play) apenas recebem '-s' (plays)."
+            },
+            {
+                id: 10,
+                part: 1,
+                type: "mc",
+                category: "Part 1: Affirmative Sentences",
+                statement: "Choose the sentence that is grammatically correct:",
+                options: ["She have a new bicycle.", "She has a new bicycle.", "She haves a new bicycle.", "She is have a new bicycle.", "She having a new bicycle."],
+                correctIndex: 1,
+                explanation: "Na 3ª pessoa do singular (She), a forma correta do verbo 'have' é 'has'."
+            },
+            // UN SCRAMBLE AFIRMATIVAS (Q11 - Q15)
+            {
+                id: 11,
+                part: 1,
+                type: "unscramble",
+                category: "Part 1: Affirmative Unscramble",
+                statement: "Ordene as palavras para formar a frase afirmativa correta:",
+                words: ["English", "studies", "every", "She", "day"],
+                correctSentence: "She studies English every day",
+                explanation: "Ordem correta: Sujeito (She) + Verbo conjugado (studies) + Objeto (English) + Expressão de tempo (every day)."
+            },
+            {
+                id: 12,
+                part: 1,
+                type: "unscramble",
+                category: "Part 1: Affirmative Unscramble",
+                statement: "Ordene as palavras para formar a frase afirmativa correta:",
+                words: ["pizza", "eat", "We", "Fridays", "on"],
+                correctSentence: "We eat pizza on Fridays",
+                explanation: "Ordem correta: Sujeito (We) + Verbo (eat) + Objeto (pizza) + Complemento (on Fridays)."
+            },
+            {
+                id: 13,
+                part: 1,
+                type: "unscramble",
+                category: "Part 1: Affirmative Unscramble",
+                statement: "Ordene as palavras com advérbio de frequência:",
+                words: ["always", "He", "early", "arrives"],
+                correctSentence: "He always arrives early",
+                explanation: "O advérbio 'always' fica logo após o sujeito 'He' e antes do verbo 'arrives'."
+            },
+            {
+                id: 14,
+                part: 1,
+                type: "unscramble",
+                category: "Part 1: Affirmative Unscramble",
+                statement: "Ordene as palavras com a exceção do verbo HAVE:",
+                words: ["has", "red", "car", "a", "My", "father"],
+                correctSentence: "My father has a red car",
+                explanation: "My father equivale a 'He', por isso usou-se 'has': My father + has + a red car."
+            },
+            {
+                id: 15,
+                part: 1,
+                type: "unscramble",
+                category: "Part 1: Affirmative Unscramble",
+                statement: "Ordene a frase com o verbo TO BE e advérbio de frequência:",
+                words: ["happy", "is", "They", "never", "are", "late"],
+                // Let's make a clean 5-word sentence:
+                words: ["are", "never", "late", "They", "for", "class"],
+                correctSentence: "They are never late for class",
+                explanation: "Com o verbo TO BE (are), o advérbio 'never' fica DEPOIS dele: They are never late for class."
+            },
+
+            // ==========================================
+            // BLOCO 2: FRASES NEGATIVAS (DON'T / DOESN'T) (Q16 - Q30)
+            // ==========================================
+            {
+                id: 16,
+                part: 2,
+                type: "mc",
+                category: "Part 2: Negative Sentences",
+                statement: "Complete the negative sentence: 'I _____ like broccoli.'",
+                options: ["doesn't", "don't", "not", "isn't", "am not"],
+                correctIndex: 1,
+                explanation: "Para o sujeito 'I', usamos o auxiliar negativo 'don't'."
+            },
+            {
+                id: 17,
+                part: 2,
+                type: "mc",
+                category: "Part 2: Negative Sentences",
+                statement: "Complete: 'She _____ drink coffee in the morning.'",
+                options: ["don't", "doesn't", "not", "isn't", "aren't"],
+                correctIndex: 1,
+                explanation: "Para 'She', o auxiliar negativo do Simple Present é 'doesn't'."
+            },
+            {
+                id: 18,
+                part: 2,
+                type: "mc",
+                category: "Part 2: Negative Sentences",
+                statement: "Choose the correct sentence (pay attention to the main verb after doesn't!):",
+                options: ["He doesn't plays soccer.", "He don't play soccer.", "He doesn't play soccer.", "He isn't play soccer.", "He doesn't playing soccer."],
+                correctIndex: 2,
+                explanation: "Quando usamos 'doesn't', o verbo principal VOLTA para a forma normal SEM 's' (play)."
+            },
+            {
+                id: 19,
+                part: 2,
+                type: "mc",
+                category: "Part 2: Negative Sentences",
+                statement: "Complete: 'My parents _____ live in New York.'",
+                options: ["doesn't", "don't", "isn't", "not", "aren't"],
+                correctIndex: 1,
+                explanation: "'My parents' são 'They' (eles). Com They, o auxiliar negativo é 'don't'."
+            },
+            {
+                id: 20,
+                part: 2,
+                type: "mc",
+                category: "Part 2: Negative Sentences",
+                statement: "Which sentence correctly negates 'She has a dog'?",
+                options: ["She doesn't has a dog.", "She don't have a dog.", "She doesn't have a dog.", "She isn't have a dog.", "She doesn't haves a dog."],
+                correctIndex: 2,
+                explanation: "ATENÇÃO! Com 'doesn't', o verbo 'has' volta para a sua forma normal 'have' (She doesn't have a dog)."
+            },
+            {
+                id: 21,
+                part: 2,
+                type: "mc",
+                category: "Part 2: Negative Sentences",
+                statement: "Complete: 'We _____ go to the beach on rainy days.'",
+                options: ["doesn't", "don't", "aren't", "not", "isn't"],
+                correctIndex: 1,
+                explanation: "Com o sujeito 'We', usamos o auxiliar 'don't'."
+            },
+            {
+                id: 22,
+                part: 2,
+                type: "mc",
+                category: "Part 2: Negative Sentences",
+                statement: "Complete: 'Tom _____ watch movies at night.'",
+                options: ["don't", "doesn't", "not", "isn't", "don't watches"],
+                correctIndex: 1,
+                explanation: "Tom equivale a 'He', portanto usamos 'doesn't'."
+            },
+            {
+                id: 23,
+                part: 2,
+                type: "mc",
+                category: "Part 2: Negative Sentences",
+                statement: "Complete: 'You _____ need a jacket today.'",
+                options: ["doesn't", "don't", "not", "aren't", "isn't"],
+                correctIndex: 1,
+                explanation: "Para o sujeito 'You', o auxiliar negativo é 'don't'."
+            },
+            {
+                id: 24,
+                part: 2,
+                type: "mc",
+                category: "Part 2: Negative Sentences",
+                statement: "Identify the INCORRECT negative sentence:",
+                options: ["They don't like horror movies.", "She doesn't works on Sundays.", "I don't speak Spanish.", "He doesn't play guitar.", "We don't eat meat."],
+                correctIndex: 1,
+                explanation: "A frase 'She doesn't works' está incorreta porque após 'doesn't' o verbo 'works' não pode ter 's'."
+            },
+            {
+                id: 25,
+                part: 2,
+                type: "mc",
+                category: "Part 2: Negative Sentences",
+                statement: "Complete: 'The cat _____ sleep in my bed.'",
+                options: ["don't", "doesn't", "isn't", "not", "aren't"],
+                correctIndex: 1,
+                explanation: "'The cat' equivale ao pronome 'It'. Para It, usamos 'doesn't'."
+            },
+            // UN SCRAMBLE NEGATIVAS (Q26 - Q30)
+            {
+                id: 26,
+                part: 2,
+                type: "unscramble",
+                category: "Part 2: Negative Unscramble",
+                statement: "Ordene as palavras para formar a negação correta:",
+                words: ["doesn't", "She", "eat", "meat"],
+                correctSentence: "She doesn't eat meat",
+                explanation: "Ordem: Sujeito (She) + Auxiliar negativo (doesn't) + Verbo na forma normal (eat) + Objeto (meat)."
+            },
+            {
+                id: 27,
+                part: 2,
+                type: "unscramble",
+                category: "Part 2: Negative Unscramble",
+                statement: "Ordene a frase negativa com o verbo HAVE:",
+                words: ["have", "He", "doesn't", "a", "car"],
+                correctSentence: "He doesn't have a car",
+                explanation: "Lembre-se: com 'doesn't', o verbo fica na forma normal 'have' (He doesn't have a car)."
+            },
+            {
+                id: 28,
+                part: 2,
+                type: "unscramble",
+                category: "Part 2: Negative Unscramble",
+                statement: "Ordene a frase negativa com o sujeito plural:",
+                words: ["don't", "They", "soda", "drink"],
+                correctSentence: "They don't drink soda",
+                explanation: "Ordem: Sujeito (They) + Auxiliar (don't) + Verbo (drink) + Objeto (soda)."
+            },
+            {
+                id: 29,
+                part: 2,
+                type: "unscramble",
+                category: "Part 2: Negative Unscramble",
+                statement: "Ordene a frase negativa sobre estudos:",
+                words: ["like", "Math", "I", "don't"],
+                correctSentence: "I don't like Math",
+                explanation: "Ordem: I + don't + like + Math."
+            },
+            {
+                id: 30,
+                part: 2,
+                type: "unscramble",
+                category: "Part 2: Negative Unscramble",
+                statement: "Ordene a frase com o verbo no infinitivo sem s:",
+                words: ["video", "doesn't", "play", "Lucy", "games"],
+                correctSentence: "Lucy doesn't play video games",
+                explanation: "Lucy + doesn't + play (sem 's') + video games."
+            },
+
+            // ==========================================
+            // BLOCO 3: FRASES INTERROGATIVAS (DO / DOES) (Q31 - Q45)
+            // ==========================================
+            {
+                id: 31,
+                part: 3,
+                type: "mc",
+                category: "Part 3: Interrogative Sentences",
+                statement: "Complete the question: '_____ you speak English?'",
+                options: ["Does", "Do", "Is", "Are", "Am"],
+                correctIndex: 1,
+                explanation: "Para fazer perguntas para o sujeito 'You', usamos o auxiliar 'Do' no início."
+            },
+            {
+                id: 32,
+                part: 3,
+                type: "mc",
+                category: "Part 3: Interrogative Sentences",
+                statement: "Complete the question: '_____ he live in Brazil?'",
+                options: ["Do", "Does", "Is", "Are", "Has"],
+                correctIndex: 1,
+                explanation: "Para perguntas com 'He/She/It', usamos o auxiliar 'Does' no início da frase."
+            },
+            {
+                id: 33,
+                part: 3,
+                type: "mc",
+                category: "Part 3: Interrogative Sentences",
+                statement: "Choose the CORRECT question (check the main verb!):",
+                options: ["Does she plays guitar?", "Do she play guitar?", "Does she play guitar?", "Is she play guitar?", "Does she playing guitar?"],
+                correctIndex: 2,
+                explanation: "Quando a pergunta começa com 'Does', o verbo principal fica na forma normal SEM 's' (play)."
+            },
+            {
+                id: 34,
+                part: 3,
+                type: "mc",
+                category: "Part 3: Interrogative Sentences",
+                statement: "Complete: '_____ your friends like pop music?'",
+                options: ["Does", "Do", "Are", "Is", "Has"],
+                correctIndex: 1,
+                explanation: "'Your friends' são 'They'. Para perguntas com They, usamos 'Do'."
+            },
+            {
+                id: 35,
+                part: 3,
+                type: "mc",
+                category: "Part 3: Interrogative Sentences",
+                statement: "Which is the correct question with the verb HAVE?",
+                options: ["Does he has a sister?", "Do he have a sister?", "Does he have a sister?", "Is he has a sister?", "Does he haves a sister?"],
+                correctIndex: 2,
+                explanation: "Com o auxiliar 'Does', o verbo 'has' volta a ser 'have' (Does he have a sister?)."
+            },
+            {
+                id: 36,
+                part: 3,
+                type: "mc",
+                category: "Part 3: Interrogative Sentences",
+                statement: "Complete: '_____ we have homework for tomorrow?'",
+                options: ["Does", "Do", "Are", "Is", "Have"],
+                correctIndex: 1,
+                explanation: "Para o sujeito 'We', a pergunta começa com 'Do'."
+            },
+            {
+                id: 37,
+                part: 3,
+                type: "mc",
+                category: "Part 3: Interrogative Sentences",
+                statement: "Complete: '_____ Maria study every afternoon?'",
+                options: ["Do", "Does", "Is", "Are", "Studies"],
+                correctIndex: 1,
+                explanation: "Maria é 'She'. A pergunta para She começa com 'Does'."
+            },
+            {
+                id: 38,
+                part: 3,
+                type: "mc",
+                category: "Part 3: Interrogative Sentences",
+                statement: "Complete: '_____ they go to the park on Sundays?'",
+                options: ["Does", "Do", "Are", "Is", "Goes"],
+                correctIndex: 1,
+                explanation: "Para o sujeito 'They', o auxiliar correto para perguntas é 'Do'."
+            },
+            {
+                id: 39,
+                part: 3,
+                type: "mc",
+                category: "Part 3: Interrogative Sentences",
+                statement: "Choose the INCORRECT question:",
+                options: ["Do you like apples?", "Does he works in a bank?", "Do they play tennis?", "Does she study English?", "Do we need help?"],
+                correctIndex: 1,
+                explanation: "A pergunta 'Does he works' tem um erro: após 'Does', o verbo não pode ter 's' (deve ser 'work')."
+            },
+            {
+                id: 40,
+                part: 3,
+                type: "mc",
+                category: "Part 3: Interrogative Sentences",
+                statement: "Complete: '_____ the dog bark at strangers?'",
+                options: ["Do", "Does", "Is", "Are", "Barks"],
+                correctIndex: 1,
+                explanation: "'The dog' equivale a 'It'. Para It, a pergunta é feita com 'Does'."
+            },
+            // UN SCRAMBLE INTERROGATIVAS (Q41 - Q45)
+            {
+                id: 41,
+                part: 3,
+                type: "unscramble",
+                category: "Part 3: Interrogative Unscramble",
+                statement: "Ordene as palavras para montar a pergunta correta:",
+                words: ["you", "Do", "like", "ice cream", "?"],
+                correctSentence: "Do you like ice cream ?",
+                explanation: "Ordem da pergunta: Auxiliar (Do) + Sujeito (you) + Verbo (like) + Objeto (ice cream) + ?"
+            },
+            {
+                id: 42,
+                part: 3,
+                type: "unscramble",
+                category: "Part 3: Interrogative Unscramble",
+                statement: "Ordene a pergunta para a 3ª pessoa do singular:",
+                words: ["Does", "she", "read", "books", "?"],
+                correctSentence: "Does she read books ?",
+                explanation: "Ordem: Auxiliar (Does) + Sujeito (she) + Verbo sem 's' (read) + Objeto (books) + ?"
+            },
+            {
+                id: 43,
+                part: 3,
+                type: "unscramble",
+                category: "Part 3: Interrogative Unscramble",
+                statement: "Ordene a pergunta com o verbo HAVE:",
+                words: ["a bicycle", "he", "have", "Does", "?"],
+                correctSentence: "Does he have a bicycle ?",
+                explanation: "Com 'Does', usamos o verbo 'have': Does + he + have + a bicycle ?"
+            },
+            {
+                id: 44,
+                part: 3,
+                type: "unscramble",
+                category: "Part 3: Interrogative Unscramble",
+                statement: "Ordene a pergunta sobre local de trabalho:",
+                words: ["they", "Do", "work", "here", "?"],
+                correctSentence: "Do they work here ?",
+                explanation: "Ordem: Do + they + work + here ?"
+            },
+            {
+                id: 45,
+                part: 3,
+                type: "unscramble",
+                category: "Part 3: Interrogative Unscramble",
+                statement: "Ordene a pergunta com o sujeito Paul:",
+                words: ["play", "Paul", "Does", "guitar", "?"],
+                correctSentence: "Does Paul play guitar ?",
+                explanation: "Ordem: Does + Paul + play + guitar ?"
+            },
+
+            // ==========================================
+            // BLOCO 4: WH-QUESTIONS & RESPOSTAS (Q46 - Q60) - 4 Opções A a D
+            // ==========================================
+            {
+                id: 46,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'Where do you live?' -> Choose the correct answer:",
+                options: ["I live in São Paulo.", "I living in São Paulo.", "I lives in São Paulo.", "I am live in São Paulo."],
+                correctIndex: 0,
+                explanation: "'Where' pergunta ONDE. Para o sujeito 'I', a resposta no Simple Present é 'I live in São Paulo'."
+            },
+            {
+                id: 47,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'What time does she wake up?' -> Choose the correct answer:",
+                options: ["She wake up at 7:00 AM.", "She wakes up at 7:00 AM.", "She waking up at 7:00 AM.", "She is wake up at 7:00 AM."],
+                correctIndex: 1,
+                explanation: "Na resposta afirmativa com 'She', devemos colocar o '-s' no verbo (She wakes up)."
+            },
+            {
+                id: 48,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'What do they eat for breakfast?' -> Choose the correct answer:",
+                options: ["They eats bread and butter.", "They eat bread and butter.", "They eating bread and butter.", "They are eat bread and butter."],
+                correctIndex: 1,
+                explanation: "Para o sujeito 'They', o verbo permanece na forma normal 'eat' sem 's'."
+            },
+            {
+                id: 49,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'Why does he study English?' -> Choose the correct answer:",
+                options: ["Because he likes languages.", "Because he like languages.", "Because he is like languages.", "Because he study languages."],
+                correctIndex: 0,
+                explanation: "'Why' (Por que) responde-se com 'Because' (Porque). Com 'he', o verbo recebe '-s' (he likes)."
+            },
+            {
+                id: 50,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'When do we start the quiz?' -> Choose the correct answer:",
+                options: ["We starts now.", "We start now.", "We starting now.", "We is start now."],
+                correctIndex: 1,
+                explanation: "Com o sujeito 'We', a forma verbal correta é 'start' (sem 's')."
+            },
+            {
+                id: 51,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'Who is your English teacher?' -> Choose the correct answer:",
+                options: ["Mr. Smith are my teacher.", "Mr. Smith is my teacher.", "Mr. Smith be my teacher.", "Mr. Smith am my teacher."],
+                correctIndex: 1,
+                explanation: "'Who' pergunta QUEM. Mr. Smith é ele (He), portanto usou-se o verbo to be 'is'."
+            },
+            {
+                id: 52,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'How does she go to work?' -> Choose the correct answer:",
+                options: ["She go by bus.", "She goes by bus.", "She going by bus.", "She is go by bus."],
+                correctIndex: 1,
+                explanation: "'How' pergunta COMO (meio de transporte). Com 'She', o verbo 'go' ganha '-es' (goes)."
+            },
+            {
+                id: 53,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'Where does Peter study?' -> Choose the correct answer:",
+                options: ["He study at Oxford.", "He studies at Oxford.", "He studys at Oxford.", "He is study at Oxford."],
+                correctIndex: 1,
+                explanation: "Peter é 'He'. Verbos em consoante + y (study) viram '-ies' (studies)."
+            },
+            {
+                id: 54,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'What does your mother do?' -> Choose the correct answer:",
+                options: ["She is a doctor.", "She do a doctor.", "She does doctor.", "She doctors."],
+                correctIndex: 0,
+                explanation: "'What does ... do?' pergunta a profissão de alguém. Responde-se 'She is a doctor'."
+            },
+            {
+                id: 55,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'When does the movie start?' -> Choose the correct answer:",
+                options: ["It starts at 8:00 PM.", "It start at 8:00 PM.", "It starting at 8:00 PM.", "It is start at 8:00 PM."],
+                correctIndex: 0,
+                explanation: "'The movie' equivale a 'It'. Por isso adicionamos '-s' no verbo (It starts)."
+            },
+            {
+                id: 56,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'Where do you buy books?' -> Choose the correct answer:",
+                options: ["I buys books at the bookstore.", "I buy books at the bookstore.", "I buying books at the bookstore.", "I am buy books at the bookstore."],
+                correctIndex: 1,
+                explanation: "Para o sujeito 'I', usa-se a forma normal do verbo 'buy' sem 's'."
+            },
+            {
+                id: 57,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'Why do they study every day?' -> Choose the correct answer:",
+                options: ["Because they want to learn.", "Because they wants to learn.", "Because they wanting to learn.", "Because they are want to learn."],
+                correctIndex: 0,
+                explanation: "Com o sujeito 'They', o verbo é 'want' sem 's'."
+            },
+            {
+                id: 58,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'What language does he speak?' -> Choose the correct answer:",
+                options: ["He speak English.", "He speaks English.", "He speaking English.", "He is speak English."],
+                correctIndex: 1,
+                explanation: "Para o sujeito 'He', o verbo afirmativo ganha '-s' (He speaks)."
+            },
+            {
+                id: 59,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'How often do you exercise?' -> Choose the correct answer:",
+                options: ["I exercise always.", "I always exercise.", "Always I exercise.", "I exercise am."],
+                correctIndex: 1,
+                explanation: "'How often' pergunta com que frequência. O advérbio 'always' fica depois do 'I' e antes do verbo 'exercise'."
+            },
+            {
+                id: 60,
+                part: 4,
+                type: "mc",
+                category: "Part 4: Wh- Questions & Answers",
+                statement: "Question: 'Which pet does Lucas have?' -> Choose the correct answer:",
+                options: ["He haves a dog.", "He has a dog.", "He have a dog.", "He having a dog."],
+                correctIndex: 1,
+                explanation: "REVISÃO DA EXCEÇÃO: Lucas é 'He', por isso usa-se 'has' (He has a dog)."
+            }
+        ];
+
+        /* ESTADO GLOBAL DO QUIZ */
+        window.processedQuestions = [];
+        window.currentQuestionIndex = 0;
+        window.userAnswers = [];
+        window.isConfirmedList = [];
+        window.unscrambleUserOrders = [];
+
+        // ALGORITMO FISHER-YATES PARA RANDOMIZAR OPÇÕES SEM ALTERAR CONTEÚDO BRUTO
+        window.processAndShuffleQuestions = function() {
+            let questions = JSON.parse(JSON.stringify(rawQuestions));
+
+            window.processedQuestions = questions.map(q => {
+                if (q.type === "mc") {
+                    let optionsWithFlag = q.options.map((optText, idx) => ({
+                        text: optText,
+                        isCorrect: idx === q.correctIndex
+                    }));
+
+                    // Embaralha as alternativas de forma verdadeiramente aleatória
+                    for (let i = optionsWithFlag.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [optionsWithFlag[i], optionsWithFlag[j]] = [optionsWithFlag[j], optionsWithFlag[i]];
+                    }
+
+                    const newCorrectIndex = optionsWithFlag.findIndex(opt => opt.isCorrect);
+
+                    return {
+                        ...q,
+                        options: optionsWithFlag.map(opt => opt.text),
+                        correctIndex: newCorrectIndex
+                    };
+                } else if (q.type === "unscramble") {
+                    // Garante que a ordem inicial exibida esteja COMPLETAMENTE embaralhada e diferente da correta
+                    let shuffledWords = [...q.words];
+                    let attempts = 0;
+                    do {
+                        for (let i = shuffledWords.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [shuffledWords[i], shuffledWords[j]] = [shuffledWords[j], shuffledWords[i]];
+                        }
+                        attempts++;
+                    } while (shuffledWords.join(' ') === q.words.join(' ') && attempts < 20);
+
+                    return {
+                        ...q,
+                        displayWords: shuffledWords
+                    };
+                }
+            });
+
+            window.userAnswers = new Array(window.processedQuestions.length).fill(null);
+            window.isConfirmedList = new Array(window.processedQuestions.length).fill(false);
+            window.unscrambleUserOrders = window.processedQuestions.map(q => q.type === "unscramble" ? [] : null);
+        };
+
+        window.startQuiz = function() {
+            window.processAndShuffleQuestions();
+
+            document.getElementById('screen-welcome').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.remove('hidden');
+            document.getElementById('open-menu-btn').classList.remove('hidden');
+            document.getElementById('score-pill').classList.remove('hidden');
+
+            window.currentQuestionIndex = 0;
+            window.renderQuestion();
+            window.updateScorePill();
+        };
+
+        window.restartQuiz = function() {
+            document.getElementById('screen-report').classList.add('hidden');
+            document.getElementById('screen-welcome').classList.remove('hidden');
+            document.getElementById('score-pill').classList.add('hidden');
+            document.getElementById('open-menu-btn').classList.add('hidden');
+        };
+
+        window.toggleQuestionMenu = function() {
+            const modal = document.getElementById('question-menu-modal');
+            if (modal.classList.contains('hidden')) {
+                window.renderQuestionGrid();
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        };
+
+        window.selectOption = function(optionIndex) {
+            if (window.isConfirmedList[window.currentQuestionIndex]) return;
+            window.userAnswers[window.currentQuestionIndex] = optionIndex;
+            window.renderQuestion();
+        };
+
+        /* LÓGICA DO INTERACTIVE SENTENCE UNSCRAMBLE */
+        window.addWordToSentence = function(word, sourceIdx) {
+            if (window.isConfirmedList[window.currentQuestionIndex]) return;
+            let currentList = window.unscrambleUserOrders[window.currentQuestionIndex];
+            
+            // Adiciona se ainda não foi usada essa posição exata
+            currentList.push({ word: word, sourceIdx: sourceIdx });
+            window.renderQuestion();
+        };
+
+        window.removeWordFromSentence = function(targetIdx) {
+            if (window.isConfirmedList[window.currentQuestionIndex]) return;
+            let currentList = window.unscrambleUserOrders[window.currentQuestionIndex];
+            currentList.splice(targetIdx, 1);
+            window.renderQuestion();
+        };
+
+        window.renderQuestion = function() {
+            const q = window.processedQuestions[window.currentQuestionIndex];
+            const isConfirmed = window.isConfirmedList[window.currentQuestionIndex];
+            const selectedIdx = window.userAnswers[window.currentQuestionIndex];
+
+            // Rótulos e barra de progresso
+            document.getElementById('question-category-tag').innerText = q.category;
+            document.getElementById('question-number-tag').innerText = `Question ${window.currentQuestionIndex + 1} of ${window.processedQuestions.length}`;
+            
+            const pct = ((window.currentQuestionIndex + 1) / window.processedQuestions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+
+            // Enunciado
+            document.getElementById('question-statement').innerText = q.statement;
+
+            // Área Interativa (MC ou Unscramble)
+            const area = document.getElementById('interactive-area');
+            area.innerHTML = '';
+
+            if (q.type === 'mc') {
+                const container = document.createElement('div');
+                container.className = "space-y-2.5";
+                const prefixes = ['A', 'B', 'C', 'D', 'E'];
+
+                q.options.forEach((optText, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = `option-btn w-full text-left p-3.5 sm:p-4 rounded-2xl border border-slate-700 bg-slate-900/80 font-semibold text-xs sm:text-base flex items-start gap-3 transition`;
+                    btn.onclick = () => window.selectOption(idx);
+
+                    if (selectedIdx === idx) {
+                        btn.classList.add('selected');
+                    }
+
+                    if (isConfirmed) {
+                        btn.disabled = true;
+                        if (idx === q.correctIndex) {
+                            btn.classList.add('correct');
+                        } else if (selectedIdx === idx) {
+                            btn.classList.add('incorrect');
+                        }
+                    }
+
+                    btn.innerHTML = `
+                        <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-800 border border-slate-600 flex items-center justify-center shrink-0 text-amber-400 font-game text-xs sm:text-sm">
+                            ${prefixes[idx]}
+                        </span>
+                        <span class="mt-0.5">${optText}</span>
+                    `;
+
+                    container.appendChild(btn);
+                });
+
+                area.appendChild(container);
+
+            } else if (q.type === 'unscramble') {
+                const unscrambleContainer = document.createElement('div');
+                unscrambleContainer.className = "space-y-4";
+
+                const userList = window.unscrambleUserOrders[window.currentQuestionIndex] || [];
+                const usedSourceIndices = userList.map(item => item.sourceIdx);
+
+                // Caixa de Construção da Frase
+                const dropZone = document.createElement('div');
+                dropZone.className = "min-h-[70px] p-3.5 rounded-2xl border-2 border-dashed border-indigo-500/50 bg-slate-950/80 flex flex-wrap gap-2 items-center";
+
+                if (userList.length === 0) {
+                    dropZone.innerHTML = `<span class="text-xs sm:text-sm text-slate-500 italic">Clique nas palavras abaixo para construir a frase...</span>`;
+                } else {
+                    userList.forEach((item, uIdx) => {
+                        const tile = document.createElement('span');
+                        tile.className = "word-tile bg-indigo-600 text-white font-bold px-3.5 py-2 rounded-xl text-xs sm:text-sm shadow-md border border-indigo-400 flex items-center gap-1.5";
+                        tile.innerHTML = `${item.word} <i class="fa-solid fa-xmark text-xs opacity-70"></i>`;
+                        if (!isConfirmed) {
+                            tile.onclick = () => window.removeWordFromSentence(uIdx);
+                        }
+                        dropZone.appendChild(tile);
+                    });
+                }
+
+                // Banco de Palavras Disponíveis
+                const wordBank = document.createElement('div');
+                wordBank.className = "flex flex-wrap gap-2 pt-2";
+
+                q.displayWords.forEach((w, sIdx) => {
+                    const isUsed = usedSourceIndices.includes(sIdx);
+                    const tile = document.createElement('button');
+                    tile.className = `word-tile font-bold px-3.5 py-2 rounded-xl text-xs sm:text-sm border transition ${isUsed ? 'bg-slate-800 text-slate-600 border-slate-800 cursor-not-allowed opacity-40' : 'bg-slate-800 hover:bg-indigo-600 text-slate-200 border-slate-600'}`;
+                    tile.innerText = w;
+                    tile.disabled = isUsed || isConfirmed;
+                    if (!isUsed && !isConfirmed) {
+                        tile.onclick = () => window.addWordToSentence(w, sIdx);
+                    }
+                    wordBank.appendChild(tile);
+                });
+
+                unscrambleContainer.appendChild(dropZone);
+                unscrambleContainer.appendChild(wordBank);
+                area.appendChild(unscrambleContainer);
+            }
+
+            // Caixa de Feedback
+            const feedbackBox = document.getElementById('feedback-box');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackText = document.getElementById('feedback-text');
+            const feedbackIcon = document.getElementById('feedback-icon');
+
+            if (isConfirmed) {
+                feedbackBox.classList.remove('hidden');
+                let isCorrect = false;
+
+                if (q.type === 'mc') {
+                    isCorrect = (selectedIdx === q.correctIndex);
+                    const prefixes = ['A', 'B', 'C', 'D', 'E'];
+                    if (isCorrect) {
+                        feedbackBox.className = "mb-6 p-4 rounded-2xl border bg-emerald-950/80 border-emerald-500/50 text-emerald-200";
+                        feedbackIcon.innerHTML = "🎉";
+                        feedbackTitle.innerText = "Correct! Excellent!";
+                        feedbackText.innerText = q.explanation;
+                    } else {
+                        feedbackBox.className = "mb-6 p-4 rounded-2xl border bg-rose-950/80 border-rose-500/50 text-rose-200";
+                        feedbackIcon.innerHTML = "⚠️";
+                        feedbackTitle.innerText = `Incorrect! (A certa é a opção ${prefixes[q.correctIndex]})`;
+                        feedbackText.innerText = q.explanation;
+                    }
+                } else if (q.type === 'unscramble') {
+                    const userSentence = (window.unscrambleUserOrders[window.currentQuestionIndex] || []).map(i => i.word).join(' ');
+                    isCorrect = (userSentence === q.correctSentence);
+
+                    if (isCorrect) {
+                        feedbackBox.className = "mb-6 p-4 rounded-2xl border bg-emerald-950/80 border-emerald-500/50 text-emerald-200";
+                        feedbackIcon.innerHTML = "🎉";
+                        feedbackTitle.innerText = "Correct Sentence! Well done!";
+                        feedbackText.innerText = q.explanation;
+                    } else {
+                        feedbackBox.className = "mb-6 p-4 rounded-2xl border bg-rose-950/80 border-rose-500/50 text-rose-200";
+                        feedbackIcon.innerHTML = "⚠️";
+                        feedbackTitle.innerText = `Incorrect! Frase Correta: "${q.correctSentence}"`;
+                        feedbackText.innerText = q.explanation;
+                    }
+                }
+            } else {
+                feedbackBox.classList.add('hidden');
+            }
+
+            // Botões de controle
+            document.getElementById('btn-prev').disabled = (window.currentQuestionIndex === 0);
+            document.getElementById('btn-prev').style.opacity = (window.currentQuestionIndex === 0) ? '0.4' : '1';
+
+            const confirmBtn = document.getElementById('btn-confirm');
+            if (isConfirmed) {
+                confirmBtn.classList.add('hidden');
+            } else {
+                confirmBtn.classList.remove('hidden');
+                let canConfirm = false;
+
+                if (q.type === 'mc') {
+                    canConfirm = (selectedIdx !== null);
+                } else if (q.type === 'unscramble') {
+                    const userList = window.unscrambleUserOrders[window.currentQuestionIndex] || [];
+                    canConfirm = (userList.length === q.words.length);
+                }
+
+                confirmBtn.disabled = !canConfirm;
+                confirmBtn.style.opacity = canConfirm ? '1' : '0.5';
+            }
+
+            const nextBtn = document.getElementById('btn-next');
+            if (window.currentQuestionIndex === window.processedQuestions.length - 1) {
+                nextBtn.innerHTML = `Ver Relatório <i class="fa-solid fa-trophy"></i>`;
+            } else {
+                nextBtn.innerHTML = `Next (Próxima) <i class="fa-solid fa-arrow-right"></i>`;
+            }
+        };
+
+        window.confirmAnswer = function() {
+            const q = window.processedQuestions[window.currentQuestionIndex];
+            
+            if (q.type === 'mc') {
+                const selectedIdx = window.userAnswers[window.currentQuestionIndex];
+                if (selectedIdx === null) return;
+                window.isConfirmedList[window.currentQuestionIndex] = true;
+                
+                if (selectedIdx === q.correctIndex && typeof confetti === 'function') {
+                    confetti({ particleCount: 40, spread: 60, origin: { y: 0.8 } });
+                }
+            } else if (q.type === 'unscramble') {
+                const userList = window.unscrambleUserOrders[window.currentQuestionIndex] || [];
+                if (userList.length !== q.words.length) return;
+
+                window.isConfirmedList[window.currentQuestionIndex] = true;
+                const userSentence = userList.map(i => i.word).join(' ');
+                
+                if (userSentence === q.correctSentence && typeof confetti === 'function') {
+                    confetti({ particleCount: 40, spread: 60, origin: { y: 0.8 } });
+                }
+            }
+
+            window.renderQuestion();
+            window.updateScorePill();
+        };
+
+        window.nextQuestion = function() {
+            if (window.currentQuestionIndex < window.processedQuestions.length - 1) {
+                window.currentQuestionIndex++;
+                window.renderQuestion();
+            } else {
+                window.showReport();
+            }
+        };
+
+        window.prevQuestion = function() {
+            if (window.currentQuestionIndex > 0) {
+                window.currentQuestionIndex--;
+                window.renderQuestion();
+            }
+        };
+
+        window.goToQuestion = function(idx) {
+            window.currentQuestionIndex = idx;
+            document.getElementById('question-menu-modal').classList.add('hidden');
+            window.renderQuestion();
+        };
+
+        window.updateScorePill = function() {
+            let score = 0;
+            window.isConfirmedList.forEach((confirmed, i) => {
+                if (confirmed) {
+                    const q = window.processedQuestions[i];
+                    if (q.type === 'mc' && window.userAnswers[i] === q.correctIndex) {
+                        score++;
+                    } else if (q.type === 'unscramble') {
+                        const userSentence = (window.unscrambleUserOrders[i] || []).map(item => item.word).join(' ');
+                        if (userSentence === q.correctSentence) score++;
+                    }
+                }
+            });
+            document.getElementById('score-text').innerText = `${score} / ${window.processedQuestions.length}`;
+        };
+
+        window.renderQuestionGrid = function() {
+            const grid = document.getElementById('questions-grid');
+            grid.innerHTML = '';
+
+            window.processedQuestions.forEach((q, i) => {
+                const isConfirmed = window.isConfirmedList[i];
+                let isCorrect = false;
+
+                if (isConfirmed) {
+                    if (q.type === 'mc') {
+                        isCorrect = (window.userAnswers[i] === q.correctIndex);
+                    } else if (q.type === 'unscramble') {
+                        const userSentence = (window.unscrambleUserOrders[i] || []).map(item => item.word).join(' ');
+                        isCorrect = (userSentence === q.correctSentence);
+                    }
+                }
+
+                const btn = document.createElement('button');
+                btn.onclick = () => window.goToQuestion(i);
+                
+                let bgClass = "bg-slate-800 text-slate-300 border-slate-700";
+                if (isConfirmed) {
+                    bgClass = isCorrect ? "bg-emerald-600 text-white border-emerald-400 font-bold" : "bg-rose-600 text-white border-rose-400 font-bold";
+                }
+
+                if (i === window.currentQuestionIndex) {
+                    bgClass += " ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900";
+                }
+
+                btn.className = `p-2 rounded-xl border text-xs sm:text-sm font-game flex items-center justify-center transition ${bgClass}`;
+                btn.innerText = i + 1;
+
+                grid.appendChild(btn);
+            });
+        };
+
+        window.showReport = function() {
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('open-menu-btn').classList.add('hidden');
+            document.getElementById('screen-report').classList.remove('hidden');
+
+            let totalCorrect = 0;
+            let totalError = 0;
+
+            let partStats = {
+                1: { correct: 0, total: 15 },
+                2: { correct: 0, total: 15 },
+                3: { correct: 0, total: 15 },
+                4: { correct: 0, total: 15 }
+            };
+
+            window.processedQuestions.forEach((q, i) => {
+                let isCorrect = false;
+                if (q.type === 'mc') {
+                    isCorrect = (window.userAnswers[i] === q.correctIndex);
+                } else if (q.type === 'unscramble') {
+                    const userSentence = (window.unscrambleUserOrders[i] || []).map(item => item.word).join(' ');
+                    isCorrect = (userSentence === q.correctSentence);
+                }
+
+                if (isCorrect) {
+                    totalCorrect++;
+                    partStats[q.part].correct++;
+                } else {
+                    totalError++;
+                }
+            });
+
+            const totalQs = window.processedQuestions.length;
+            const correctPct = Math.round((totalCorrect / totalQs) * 100);
+            const errorPct = Math.round((totalError / totalQs) * 100);
+
+            document.getElementById('stat-correct-count').innerText = totalCorrect;
+            document.getElementById('stat-correct-pct').innerText = `(${correctPct}%)`;
+            document.getElementById('stat-error-count').innerText = totalError;
+            document.getElementById('stat-error-pct').innerText = `(${errorPct}%)`;
+
+            const affPct = Math.round((partStats[1].correct / partStats[1].total) * 100);
+            const negInterrogPct = Math.round(((partStats[2].correct + partStats[3].correct + partStats[4].correct) / 45) * 100);
+
+            document.getElementById('stat-aff-pct').innerText = `${affPct}%`;
+            document.getElementById('stat-neg-pct').innerText = `${negInterrogPct}%`;
+
+            // Emoji e Título
+            const emojiEl = document.getElementById('report-emoji');
+            const titleEl = document.getElementById('report-title');
+            if (correctPct >= 80) {
+                emojiEl.innerText = "🚀";
+                titleEl.innerText = "English Commander! Outstanding!";
+            } else if (correctPct >= 50) {
+                emojiEl.innerText = "🌟";
+                titleEl.innerText = "Space Cadet! Good job!";
+            } else {
+                emojiEl.innerText = "🛸";
+                titleEl.innerText = "Keep Training, Cadet!";
+            }
+
+            // Recomendações
+            const recBox = document.getElementById('review-recommendations');
+            recBox.innerHTML = `<h4 class="font-game text-amber-300 text-base sm:text-lg mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-clipboard-list text-cyan-400"></i> Diagnóstico e Recomendações de Estudo:
+            </h4>`;
+
+            let hasNeeds = false;
+
+            if (partStats[1].correct / partStats[1].total < 0.7) {
+                hasNeeds = true;
+                recBox.innerHTML += `
+                    <div class="bg-amber-950/40 border border-amber-500/30 p-3 rounded-xl text-xs sm:text-sm text-slate-200">
+                        <strong class="text-amber-300">✨ Revisar Frases Afirmativas & He/She/It:</strong> Lembre-se de adicionar <strong>-s</strong>, <strong>-es</strong> ou <strong>-ies</strong> no verbo apenas para He/She/It e atente-se à exceção do verbo <strong>have -> HAS</strong>.
+                    </div>
+                `;
+            }
+
+            if (partStats[2].correct / partStats[2].total < 0.7) {
+                hasNeeds = true;
+                recBox.innerHTML += `
+                    <div class="bg-rose-950/40 border border-rose-500/30 p-3 rounded-xl text-xs sm:text-sm text-slate-200">
+                        <strong class="text-rose-300">🚫 Revisar Negação (Don't / Doesn't):</strong> Lembre-se que usa-se <strong>doesn't</strong> para He/She/It e <strong>don't</strong> para os demais. O verbo principal SEMPRE volta à forma normal sem 's'!
+                    </div>
+                `;
+            }
+
+            if (partStats[3].correct / partStats[3].total < 0.7) {
+                hasNeeds = true;
+                recBox.innerHTML += `
+                    <div class="bg-indigo-950/40 border border-indigo-500/30 p-3 rounded-xl text-xs sm:text-sm text-slate-200">
+                        <strong class="text-indigo-300">❓ Revisar Interrogativa (Do / Does):</strong> As perguntas iniciam com <strong>Do</strong> ou <strong>Does</strong> antes do sujeito. Com <strong>Does</strong>, o verbo principal perde o 's' e volta para a forma normal.
+                    </div>
+                `;
+            }
+
+            if (partStats[4].correct / partStats[4].total < 0.7) {
+                hasNeeds = true;
+                recBox.innerHTML += `
+                    <div class="bg-purple-950/40 border border-purple-500/30 p-3 rounded-xl text-xs sm:text-sm text-slate-200">
+                        <strong class="text-purple-300">🎯 Revisar Wh- Questions & Advérbios:</strong> Pratique os significados de <em>Where, What, When, Who, Why, How</em> e lembre-se que os advérbios (always, never) ficam DEPOIS do verbo <em>to be</em> e ANTES dos demais verbos.
+                    </div>
+                `;
+            }
+
+            if (!hasNeeds) {
+                recBox.innerHTML += `
+                    <div class="bg-emerald-950/40 border border-emerald-500/30 p-3 rounded-xl text-xs sm:text-sm text-emerald-200 font-bold">
+                        🎉 Parabéns! Você domina completamente o Simple Present em inglês! Seu desempenho foi fantástico em todas as partes.
+                    </div>
+                `;
+            }
+
+            if (typeof confetti === 'function' && correctPct >= 60) {
+                confetti({
+                    particleCount: 100,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+            }
+        };
+    </script>
+</body>
+</html>
